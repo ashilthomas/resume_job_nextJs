@@ -7,6 +7,8 @@
   --color-accent: rgb(130, 91, 247);
   --color-destructive: rgb(242, 82, 28);
   --color-muted: rgb(75, 85, 99);
+  --color-dark-border: rgb(70, 70, 74);
+  --color-light-border: rgb(200, 200, 204);
 }
 body{
 
@@ -46,6 +48,12 @@ body{
 }
 .text-destructive {
   color: var(--color-destructive);
+}
+.border-dark {
+  border-color: var(--color-dark-border);
+}
+.border-light {
+  border-color: var(--color-light-border);
 }
 a {
   text-decoration: none;
