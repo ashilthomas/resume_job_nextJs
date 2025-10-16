@@ -52,8 +52,8 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
         disabled={!file || loading}
         className={`mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white transition ${
           loading
-            ? "bg-blue-300 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
+            ? "bg-background cursor-not-allowed"
+            : "bg-background hover:bg-blue-700"
         }`}
       >
         {loading ? (

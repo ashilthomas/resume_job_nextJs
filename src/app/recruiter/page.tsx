@@ -17,7 +17,7 @@ export default function RecruiterDashboard() {
         title="Recruiter Dashboard"
         subtitle="Manage your job postings and track candidate applications."
         action={
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+          <button className="flex items-center gap-2 px-4 py-2 bg-background text-white rounded-lg font-medium hover:bg-blue-700 transition">
             <PlusCircle size={18} />
             Post New Job
           </button>
