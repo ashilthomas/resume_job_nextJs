@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import { parseResumeFile } from "@/lib/parser";
+import { parseResumeBuffer } from "@/lib/parser";
 import Resume from "@/lib/models/Resume";
 import { connectDB } from "@/lib/db";
 
@@ -23,26 +23,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
-    // Convert uploaded file to buffer
+    // Convert uploaded file to buffer and parse directly (no disk path dependency)
     const buffer = Buffer.from(await file.arrayBuffer());
-
-    // Ensure uploads directory exists
-    const uploadsDir = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-
-    // Save file with a unique name
-    const timestamp = Date.now();
-    const sanitizedFileName = file.name.replace(/\s+/g, "_"); // replace spaces
-    const filePath = path.join(uploadsDir, `${timestamp}-${sanitizedFileName}`);
-    fs.writeFileSync(filePath, buffer);
-
-    // Parse the uploaded file
-    const parsed = await parseResumeFile(filePath, file.type);
+    const parsed = await parseResumeBuffer(buffer, file.name, file.type);
 
     // Save to database
     const resume = await Resume.create({
       fileName: file.name,
-      filePath,
+      filePath: null,
       parsed,
       skills: parsed.skills,
       atsScore: Math.floor(Math.random() * 40 + 60), // dummy ATS score 60–100
