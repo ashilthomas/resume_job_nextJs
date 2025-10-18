@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const MONGO_URI = process.env.MONGO_URI ||  "mongodb+srv://ashilthomas31_db_user:IRjvQwkLsC37Kdbodev@cluster0.vgd4lls.mongodb.net/AiResume_Job";
+const MONGO_URI = process.env.MONGO_URI ||  "mongodb+srv://ashilthomas31_db_user:ITleQWSBHpONrLEO@cluster0.vgd4lls.mongodb.net/AiResume_Job";
 
 
 if (!MONGO_URI) {
