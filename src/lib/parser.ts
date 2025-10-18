@@ -20,7 +20,7 @@ const extractText =async(filepath:string , mimetype:string)=>{
 
 }
 
-const parseResumeFile =async(filePath: string, mimetype: string)=>{
+ export const parseResumeFile =async(filePath: string, mimetype: string)=>{
   const text = await extractText(filePath, mimetype);
     const emails = text.match(emailRegex) || [];
     const phones = text.match(phoneRegex) || [];

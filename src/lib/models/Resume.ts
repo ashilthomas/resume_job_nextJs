@@ -1,11 +1,11 @@
 import mongoose, { Schema, Document } from "mongoose";
 export interface IResume extends Document{
-    filename:String;
-    filepath:string;
+    fileName:String;
+    filePath:string;
       parsed: any;
        skills: string[];
 
-     atsScore: number;,
+     atsScore: number;
        createdAt: Date;
 }
 const ResumeSchema = new Schema<IResume>({
