@@ -13,27 +13,12 @@ async function extractTextFromBuffer(
   const ext = (fileName ? path.extname(fileName) : "").toLowerCase();
 
   if (ext === ".pdf" || mimeType.includes("pdf")) {
-    // Use pdfjs-dist LEGACY ESM build in Node to avoid DOM APIs like DOMMatrix
+    // Use pdf-parse on the server to avoid worker/module resolution issues
     try {
-      const pdfjsModule: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
-      const pdfjs: any = (pdfjsModule as any).default ?? pdfjsModule;
-      const loadingTask = pdfjs.getDocument({
-        data: new Uint8Array(fileBuffer),
-        disableWorker: true,
-        isEvalSupported: false,
-      });
-      const pdf = await loadingTask.promise;
-
-      const pageTexts: string[] = [];
-      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
-        const page = await pdf.getPage(pageNum);
-        const content = await page.getTextContent();
-        const strings = (content.items || []).map((item: any) =>
-          (item && typeof item === "object" && "str" in item) ? (item as any).str : String(item)
-        );
-        pageTexts.push(strings.join(" "));
-      }
-      return pageTexts.join("\n");
+      const pdfParseModule: any = await import("pdf-parse");
+      const pdfParse: any = (pdfParseModule as any).default ?? pdfParseModule;
+      const result = await pdfParse(fileBuffer);
+      return (result && typeof result.text === "string") ? result.text : "";
     } catch (err: any) {
       throw new Error(`Failed to extract PDF text: ${err?.message || "Unknown error"}`);
     }
