@@ -13,12 +13,38 @@ async function extractTextFromBuffer(
   const ext = (fileName ? path.extname(fileName) : "").toLowerCase();
 
   if (ext === ".pdf" || mimeType.includes("pdf")) {
-    // Dynamically import to avoid bundler evaluating at module load
-    const pdfModule: any = await import("pdf-parse");
-    const pdfParseFn: (buf: Buffer) => Promise<{ text: string }> =
-      (pdfModule && (pdfModule.default as any)) || (pdfModule as any);
-    const data = await pdfParseFn(fileBuffer);
-    return data.text;
+    // Prefer pdf-parse (fast/simple). Fallback to pdfjs-dist if it fails (e.g., ENOENT quirks)
+    try {
+      // Dynamically import to avoid bundler evaluating at module load
+      const pdfModule: any = await import("pdf-parse");
+      const pdfParseFn: (buf: Buffer) => Promise<{ text: string }> =
+        (pdfModule && (pdfModule.default as any)) || (pdfModule as any);
+      const data = await pdfParseFn(fileBuffer);
+      return data.text;
+    } catch (primaryErr: any) {
+      // Robust fallback using pdfjs-dist to read from in-memory buffer only
+      try {
+        const pdfjsLib: any = await import("pdfjs-dist");
+        const pdfjs: any = (pdfjsLib as any).default ?? pdfjsLib;
+        const loadingTask = pdfjs.getDocument({ data: new Uint8Array(fileBuffer) });
+        const pdf = await loadingTask.promise;
+
+        const pageTexts: string[] = [];
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+          const page = await pdf.getPage(pageNum);
+          const content = await page.getTextContent();
+          const strings = (content.items || []).map((item: any) =>
+            (item && typeof item === "object" && "str" in item) ? (item as any).str : String(item)
+          );
+          pageTexts.push(strings.join(" "));
+        }
+        return pageTexts.join("\n");
+      } catch (fallbackErr: any) {
+        throw new Error(
+          `Failed to extract PDF text: ${fallbackErr?.message || primaryErr?.message || "Unknown error"}`
+        );
+      }
+    }
   }
 
   if (
