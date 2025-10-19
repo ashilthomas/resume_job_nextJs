@@ -1,10 +1,11 @@
 // app/api/resumes/upload/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 import { parseResumeBuffer } from "@/lib/parser";
 import Resume from "@/lib/models/Resume";
 import { connectDB } from "@/lib/db";
+
+// Ensure this route runs on the Node.js runtime (not Edge)
+export const runtime = "nodejs";
 
 export const config = {
   api: {
