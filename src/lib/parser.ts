@@ -13,18 +13,9 @@ async function extractTextFromBuffer(
   const ext = (fileName ? path.extname(fileName) : "").toLowerCase();
 
   if (ext === ".pdf" || mimeType.includes("pdf")) {
-    // Prefer pdfjs-dist LEGACY build in Node to avoid DOM APIs like DOMMatrix
+    // Use pdfjs-dist LEGACY ESM build in Node to avoid DOM APIs like DOMMatrix
     try {
-      let pdfjsModule: any;
-      try {
-        pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.mjs");
-      } catch (e1) {
-        try {
-          pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.js");
-        } catch (e2) {
-          pdfjsModule = await import("pdfjs-dist/legacy/build/pdf");
-        }
-      }
+      const pdfjsModule: any = await import("pdfjs-dist/legacy/build/pdf.mjs");
       const pdfjs: any = (pdfjsModule as any).default ?? pdfjsModule;
       const loadingTask = pdfjs.getDocument({
         data: new Uint8Array(fileBuffer),
@@ -43,19 +34,8 @@ async function extractTextFromBuffer(
         pageTexts.push(strings.join(" "));
       }
       return pageTexts.join("\n");
-    } catch (primaryErr: any) {
-      // Fallback to pdf-parse as a simpler extractor if pdfjs-dist fails
-      try {
-        const pdfModule: any = await import("pdf-parse");
-        const pdfParseFn: (buf: Buffer) => Promise<{ text: string }> =
-          (pdfModule && (pdfModule.default as any)) || (pdfModule as any);
-        const data = await pdfParseFn(fileBuffer);
-        return data.text;
-      } catch (fallbackErr: any) {
-        throw new Error(
-          `Failed to extract PDF text: ${fallbackErr?.message || primaryErr?.message || "Unknown error"}`
-        );
-      }
+    } catch (err: any) {
+      throw new Error(`Failed to extract PDF text: ${err?.message || "Unknown error"}`);
     }
   }
 
