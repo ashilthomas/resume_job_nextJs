@@ -15,11 +15,24 @@ async function extractTextFromBuffer(
   if (ext === ".pdf" || mimeType.includes("pdf")) {
     // Use pdf-parse on the server to avoid worker/module resolution issues
     try {
+      // Create the test directory and file if it doesn't exist to prevent pdf-parse from failing
+      const testFilePath = path.join(process.cwd(), 'test', 'data', '05-versions-space.pdf');
+      const testDirPath = path.dirname(testFilePath);
+      
+      if (!fs.existsSync(testDirPath)) {
+        fs.mkdirSync(testDirPath, { recursive: true });
+      }
+      
+      if (!fs.existsSync(testFilePath)) {
+        fs.writeFileSync(testFilePath, 'Dummy PDF content');
+      }
+      
       const pdfParseModule: any = await import("pdf-parse");
       const pdfParse: any = (pdfParseModule as any).default ?? pdfParseModule;
       const result = await pdfParse(fileBuffer);
       return (result && typeof result.text === "string") ? result.text : "";
     } catch (err: any) {
+      console.error("PDF parsing error:", err);
       throw new Error(`Failed to extract PDF text: ${err?.message || "Unknown error"}`);
     }
   }
@@ -64,27 +77,32 @@ export async function parseResumeBuffer(
   fileName: string,
   mimeType: string
 ) {
-  const text = await extractTextFromBuffer(fileBuffer, fileName, mimeType);
-  const emails = text.match(emailRegex) || [];
-  const phones = text.match(phoneRegex) || [];
+  try {
+    const text = await extractTextFromBuffer(fileBuffer, fileName, mimeType);
+    const emails = text.match(emailRegex) || [];
+    const phones = text.match(phoneRegex) || [];
 
-  const skillsList = [
-    "python",
-    "javascript",
-    "react",
-    "node",
-    "aws",
-    "docker",
-    "typescript",
-    "java",
-  ];
-  const foundSkills = skillsList.filter((s) => text.toLowerCase().includes(s));
+    const skillsList = [
+      "python",
+      "javascript",
+      "react",
+      "node",
+      "aws",
+      "docker",
+      "typescript",
+      "java",
+    ];
+    const foundSkills = skillsList.filter((s) => text.toLowerCase().includes(s));
 
-  return {
-    rawText: text,
-    emails,
-    phones,
-    skills: [...new Set(foundSkills)],
-    summary: text.split("\n").slice(0, 5).join(" "),
-  };
+    return {
+      rawText: text,
+      emails,
+      phones,
+      skills: [...new Set(foundSkills)],
+      summary: text.split("\n").slice(0, 5).join(" "),
+    };
+  } catch (err: any) {
+    console.error("Resume parsing error:", err);
+    throw new Error(`Failed to parse resume: ${err?.message || "Unknown error"}`);
+  }
 }
