@@ -13,32 +13,44 @@ async function extractTextFromBuffer(
   const ext = (fileName ? path.extname(fileName) : "").toLowerCase();
 
   if (ext === ".pdf" || mimeType.includes("pdf")) {
-    // Prefer pdf-parse (fast/simple). Fallback to pdfjs-dist if it fails (e.g., ENOENT quirks)
+    // Prefer pdfjs-dist LEGACY build in Node to avoid DOM APIs like DOMMatrix
     try {
-      // Dynamically import to avoid bundler evaluating at module load
-      const pdfModule: any = await import("pdf-parse");
-      const pdfParseFn: (buf: Buffer) => Promise<{ text: string }> =
-        (pdfModule && (pdfModule.default as any)) || (pdfModule as any);
-      const data = await pdfParseFn(fileBuffer);
-      return data.text;
-    } catch (primaryErr: any) {
-      // Robust fallback using pdfjs-dist to read from in-memory buffer only
+      let pdfjsModule: any;
       try {
-        const pdfjsLib: any = await import("pdfjs-dist");
-        const pdfjs: any = (pdfjsLib as any).default ?? pdfjsLib;
-        const loadingTask = pdfjs.getDocument({ data: new Uint8Array(fileBuffer) });
-        const pdf = await loadingTask.promise;
-
-        const pageTexts: string[] = [];
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
-          const page = await pdf.getPage(pageNum);
-          const content = await page.getTextContent();
-          const strings = (content.items || []).map((item: any) =>
-            (item && typeof item === "object" && "str" in item) ? (item as any).str : String(item)
-          );
-          pageTexts.push(strings.join(" "));
+        pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.mjs");
+      } catch (e1) {
+        try {
+          pdfjsModule = await import("pdfjs-dist/legacy/build/pdf.js");
+        } catch (e2) {
+          pdfjsModule = await import("pdfjs-dist/legacy/build/pdf");
         }
-        return pageTexts.join("\n");
+      }
+      const pdfjs: any = (pdfjsModule as any).default ?? pdfjsModule;
+      const loadingTask = pdfjs.getDocument({
+        data: new Uint8Array(fileBuffer),
+        disableWorker: true,
+        isEvalSupported: false,
+      });
+      const pdf = await loadingTask.promise;
+
+      const pageTexts: string[] = [];
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+        const page = await pdf.getPage(pageNum);
+        const content = await page.getTextContent();
+        const strings = (content.items || []).map((item: any) =>
+          (item && typeof item === "object" && "str" in item) ? (item as any).str : String(item)
+        );
+        pageTexts.push(strings.join(" "));
+      }
+      return pageTexts.join("\n");
+    } catch (primaryErr: any) {
+      // Fallback to pdf-parse as a simpler extractor if pdfjs-dist fails
+      try {
+        const pdfModule: any = await import("pdf-parse");
+        const pdfParseFn: (buf: Buffer) => Promise<{ text: string }> =
+          (pdfModule && (pdfModule.default as any)) || (pdfModule as any);
+        const data = await pdfParseFn(fileBuffer);
+        return data.text;
       } catch (fallbackErr: any) {
         throw new Error(
           `Failed to extract PDF text: ${fallbackErr?.message || primaryErr?.message || "Unknown error"}`
