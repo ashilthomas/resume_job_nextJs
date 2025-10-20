@@ -106,11 +106,12 @@ export default function AddJobPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-5xl mx-auto">
       <SectionHeader
         title="Add New Job"
         subtitle="Create a new job posting with required skills for matching with candidates."
       />
+      <p className="text-sm text-muted">Fields marked with <span className="text-destructive">*</span> are required.</p>
       
       {success && (
         <div className="p-4 bg-secondary/10 border border-secondary/20 rounded-lg text-secondary">
@@ -230,16 +231,20 @@ export default function AddJobPage() {
                   onChange={handleChange}
                   required
                   rows={6}
+                  maxLength={1000}
                   className="w-full pl-10 px-4 py-3 border border-light rounded-lg focus:ring-primary focus:border-primary"
                   placeholder="Describe the role, responsibilities, and requirements..."
                 />
               </div>
-              <p className="mt-2 text-xs text-muted">Provide a clear and concise description to attract qualified candidates.</p>
+              <div className="mt-2 flex items-center justify-between">
+                <p className="text-xs text-muted">Provide a clear and concise description to attract qualified candidates.</p>
+                <span className="text-xs text-muted">{formData.description.length}/1000</span>
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <div className="p-6 bg-background rounded-2xl border border-light">
+          <div className="space-y-4 lg:sticky lg:top-6">
+            <div className="p-6 bg-background rounded-2xl border border-light shadow-sm">
               <h3 className="text-lg font-semibold text-foreground mb-4">Live Preview</h3>
               <div className="p-4 bg-background rounded-xl border border-light">
                 <div className="flex items-center gap-2 mb-2">
@@ -268,13 +273,26 @@ export default function AddJobPage() {
         </div>
 
         <div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-primary text-white py-3 px-4 rounded-lg hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            {loading ? (<><Loader2 className="animate-spin" size={18} /> Creating...</>) : (<>Post Job</>)}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full sm:w-auto bg-primary text-white py-3 px-4 rounded-lg hover:bg-accent focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {loading ? (<><Loader2 className="animate-spin" size={18} /> Creating...</>) : (<>Post Job</>)}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({ title: "", company: "", description: "", location: "", requiredSkills: "" });
+                setSkills([]);
+                setSkillInput("");
+              }}
+              className="w-full sm:w-auto bg-background text-foreground border border-light py-3 px-4 rounded-lg hover:bg-foreground/5"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       </form>
     </div>

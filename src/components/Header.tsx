@@ -22,7 +22,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-extrabold bg-gradient-to-r text-background  bg-clip-text">
+          <span className="text-2xl font-extrabold bg-gradient-to-r text-foreground  bg-clip-text">
             AI Resume Portal
           </span>
         </Link>

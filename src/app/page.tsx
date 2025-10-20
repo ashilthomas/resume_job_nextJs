@@ -4,7 +4,7 @@ import Link from "next/link";
 export default function HomePage() {
   return (
     <section className="flex flex-col items-center justify-center text-center py-20">
-      <h1 className="text-4xl md:text-5xl  text-background font-extrabold mb-6">
+      <h1 className="text-4xl md:text-5xl text-foreground font-extrabold mb-6">
         AI Resume & Job Match Portal
       </h1>
 
@@ -15,7 +15,7 @@ export default function HomePage() {
 
       <Link 
         href="/upload"
-        className="px-6 py-3 bg-background text-foreground  font-semibold rounded-xl shadow  transition"
+        className="px-6 py-3 bg-foreground text-background  font-semibold rounded-xl shadow  transition"
       >
         Get Started – Upload Resume
       </Link>
@@ -41,7 +41,7 @@ export default function HomePage() {
 function FeatureCard({ title, desc }: { title: string; desc: string }) {
   return (
     <div className="p-6 bg-white rounded-2xl shadow hover:shadow-lg transition">
-      <h3 className="text-xl font-semibold mb-2 text-background">{title}</h3>
+      <h3 className="text-xl font-semibold mb-2 text-foreground">{title}</h3>
       <p className="text-gray-600">{desc}</p>
     </div>
   );
