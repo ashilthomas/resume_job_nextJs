@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: rgb(53, 53, 58);
-  --color-foreground: rgb(235, 235, 241);
-  --color-primary: rgb(130, 91, 247);
-  --color-accent: rgb(130, 91, 247);
-  --color-destructive: rgb(242, 82, 28);
-  --color-muted: rgb(75, 85, 99);
-  --color-dark-border: rgb(70, 70, 74);
-  --color-light-border: rgb(200, 200, 204);
+  --color-background: rgb(255, 255, 255);
+  --color-foreground: rgb(0, 0, 0);
+  --color-primary: rgb(0, 0, 0);
+  --color-accent: rgb(0, 0, 0);
+  --color-secondary: rgb(0, 0, 0);
+  --color-destructive: rgb(239, 68, 68);
+  --color-muted: rgb(100, 100, 100);
+  --color-dark-border: rgb(50, 50, 50);
+  --color-light-border: rgb(229, 229, 229);
 }
 body{
 

@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
-import ResumeCard from "@/components/ResumeCard";
 import JobMatchCard from "@/components/JobMatchCard";
-import { findTopJobMatches } from "@/lib/utils";
 
-export default function DashboardPage() {
+export default function ResumeMatchesPage() {
+  const params = useParams();
+  const resumeId = params.id as string;
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resume, setResume] = useState<any>(null);
@@ -17,50 +19,30 @@ export default function DashboardPage() {
       try {
         setLoading(true);
         
-        // Fetch the most recent resume
-        const resumeRes = await fetch('/api/resumes');
+        // Fetch the resume details
+        const resumeRes = await fetch(`/api/resumes/${resumeId}`);
         if (!resumeRes.ok) throw new Error('Failed to fetch resume data');
         const resumeData = await resumeRes.json();
         
-        if (!resumeData.resumes || resumeData.resumes.length === 0) {
-          setError('No resumes found. Please upload a resume first.');
-          setLoading(false);
-          return;
-        }
+        // Fetch job matches for this resume
+        const matchesRes = await fetch(`/api/resumes/${resumeId}/matches`);
+        if (!matchesRes.ok) throw new Error('Failed to fetch job matches');
+        const matchesData = await matchesRes.json();
         
-        // Get the most recent resume
-        const latestResume = resumeData.resumes[0];
-        
-        // Fetch all jobs
-        const jobsRes = await fetch('/api/jobs');
-        if (!jobsRes.ok) throw new Error('Failed to fetch job data');
-        const jobsData = await jobsRes.json();
-        
-        // Calculate top job matches
-        const topMatches = findTopJobMatches(latestResume.skills, jobsData.jobs || []);
-        
-        // Extract name and email from parsed resume data
-        const name = latestResume.parsed?.name || 'Candidate';
-        const email = latestResume.parsed?.emails?.[0] || '';
-        
-        setResume({
-          name,
-          email,
-          skills: latestResume.skills || [],
-          atsScore: latestResume.atsScore || 0,
-        });
-        
-        setJobMatches(topMatches);
+        setResume(resumeData.resume);
+        setJobMatches(matchesData.jobMatches || []);
       } catch (err: any) {
-        console.error('Dashboard data fetch error:', err);
-        setError(err.message || 'Failed to load dashboard data');
+        console.error('Job matches fetch error:', err);
+        setError(err.message || 'Failed to load job matches');
       } finally {
         setLoading(false);
       }
     }
     
-    fetchData();
-  }, []);
+    if (resumeId) {
+      fetchData();
+    }
+  }, [resumeId]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -72,24 +54,17 @@ export default function DashboardPage() {
     <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-red-700">
       <p className="font-medium">Error</p>
       <p>{error}</p>
-      {error.includes('No resumes found') && (
-        <a href="/upload" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          Upload Resume
-        </a>
-      )}
     </div>
   );
 
-  const firstName = resume?.name?.split(' ')[0] || 'there';
+  const candidateName = resume?.parsed?.name || 'Candidate';
 
   return (
     <div className="space-y-8">
       <SectionHeader
-        title={`Welcome back, ${firstName} 👋`}
-        subtitle="Here's your current resume insights, ATS performance, and top job matches."
+        title={`Job Matches for ${candidateName}`}
+        subtitle="Here are the top job matches based on your skills and experience."
       />
-
-      <ResumeCard {...resume} />
 
       <section>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches</h2>
