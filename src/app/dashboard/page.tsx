@@ -86,13 +86,13 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <SectionHeader
         title={`Welcome back, ${firstName} 👋`}
-        subtitle="Here's your current resume insights, ATS performance, and top job matches."
+        subtitle={resume?.email ? `${resume.email} • Here's your current resume insights, ATS performance, and top job matches.` : `Here's your current resume insights, ATS performance, and top job matches.`}
       />
 
       <ResumeCard {...resume} />
 
       <section>
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches</h2>
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches for {firstName}</h2>
         {jobMatches.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-6">
             {jobMatches.map((job: any, idx: number) => (
@@ -107,7 +107,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
-            <p>No job matches found. Add more jobs to see potential matches.</p>
+            <p>No job matches found for {firstName}. Add more jobs to see potential matches.</p>
             <a href="/recruiter" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               Add Jobs
             </a>

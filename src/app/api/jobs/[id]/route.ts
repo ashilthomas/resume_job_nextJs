@@ -22,3 +22,23 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     );
   }
 }
+
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    await connectDB();
+
+    const jobId = params.id;
+    const deleted = await Job.findByIdAndDelete(jobId);
+    if (!deleted) {
+      return NextResponse.json({ error: "Job not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Error deleting job:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to delete job" },
+      { status: 500 }
+    );
+  }
+}

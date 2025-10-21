@@ -132,19 +132,23 @@ export default function AddJobPage() {
               <label htmlFor="title" className="block text-sm font-medium text-foreground mb-2">
                 Job Title *
               </label>
-              <div className="relative">
-                <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
-                <input
-                  type="text"
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  className="w-full pl-10 px-4 py-3 border border-light rounded-lg focus:ring-primary focus:border-primary"
-                  placeholder="Senior Frontend Engineer"
-                />
-              </div>
+<div className="relative">
+  <Briefcase
+    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+    size={18}
+  />
+  <input
+    type="text"
+    id="title"
+    name="title"
+    value={formData.title}
+    onChange={handleChange}
+    required
+    placeholder="Senior Frontend Engineer"
+    className="w-full pl-14 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary placeholder:text-gray-400"
+  />
+</div>
+
             </div>
             
             <div>
@@ -152,7 +156,7 @@ export default function AddJobPage() {
                 Company *
               </label>
               <div className="relative">
-                <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                <Building2 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                 <input
                   type="text"
                   id="company"
@@ -171,7 +175,7 @@ export default function AddJobPage() {
                 Location
               </label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                 <input
                   type="text"
                   id="location"
@@ -189,7 +193,7 @@ export default function AddJobPage() {
                 Required Skills (press Enter or comma to add)
               </label>
               <div className="relative">
-                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
+                <Tag className="absolute right-3 top-1/2 -translate-y-1/2 text-muted" size={18} />
                 <input
                   type="text"
                   id="requiredSkills"
@@ -223,7 +227,7 @@ export default function AddJobPage() {
                 Job Description *
               </label>
               <div className="relative">
-                <FileText className="absolute left-3 top-3 text-muted" size={18} />
+                <FileText className="absolute right-3 top-3 text-muted" size={18} />
                 <textarea
                   id="description"
                   name="description"

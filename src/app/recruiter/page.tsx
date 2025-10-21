@@ -71,6 +71,7 @@ export default function RecruiterDashboard() {
                 location={job.location || 'Remote'}
                 skills={job.requiredSkills || []}
                 createdAt={job.createdAt}
+                onDeleted={(deletedId) => setJobs((prev) => prev.filter((j) => j._id !== deletedId))}
               />
             ))}
           </div>

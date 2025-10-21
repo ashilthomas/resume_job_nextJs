@@ -4,6 +4,7 @@ import "server-only";
 
 const emailRegex = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g;
 const phoneRegex = /(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4})/g;
+const nameRegex = /\b([A-Z][a-zA-Z'’\-\.]+(?:\s[A-Z][a-zA-Z'’\-\.]+)+)\b/g;
 
 async function extractTextFromBuffer(
   fileBuffer: Buffer,
@@ -59,6 +60,7 @@ export async function parseResumeFile(filePath: string, mimeType: string) {
   const text = await extractTextFromBuffer(fileBuffer, filePath, mimeType);
   const emails = text.match(emailRegex) || [];
   const phones = text.match(phoneRegex) || [];
+  const name = text.match(nameRegex) || [];
 
   const skillsList = ["python", "javascript", "react", "node", "aws", "docker", "typescript", "java"];
   const foundSkills = skillsList.filter((s) => text.toLowerCase().includes(s));
@@ -67,6 +69,7 @@ export async function parseResumeFile(filePath: string, mimeType: string) {
     rawText: text,
     emails,
     phones,
+    name,
     skills: [...new Set(foundSkills)],
     summary: text.split("\n").slice(0, 5).join(" "),
   };
@@ -82,6 +85,49 @@ export async function parseResumeBuffer(
     const emails = text.match(emailRegex) || [];
     const phones = text.match(phoneRegex) || [];
 
+    // Heuristic name extraction
+    const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+
+    const titleCase = (s: string) => s
+      .split(/\s+/)
+      .map((w) => w ? w.charAt(0).toUpperCase() + w.slice(1).toLowerCase() : w)
+      .join(" ");
+
+    const nameFromEmail = (email: string | undefined) => {
+      if (!email) return "";
+      const local = email.split("@")[0];
+      const parts = local.split(/[._-]+/).filter(Boolean);
+      if (!parts.length) return "";
+      return titleCase(parts.join(" "));
+    };
+
+    // Try explicit "Name:" pattern
+    let nameMatch = text.match(/(?:^|\n)\s*Name\s*[:\-]\s*(.+)/i);
+    let extractedName = nameMatch ? nameMatch[1].split(/\r?\n/)[0].trim() : "";
+
+    // Fallback: first plausible proper-case line
+    if (!extractedName) {
+      const isLikelyName = (l: string) => {
+        // exclude lines with emails/phones or common section headers
+        if (emailRegex.test(l) || phoneRegex.test(l)) return false;
+        const headerKeywords = /summary|experience|education|skills|projects|certifications|profile|objective/i;
+        if (headerKeywords.test(l)) return false;
+        // Typical name pattern: 2-4 words starting uppercase and mostly alphabetic
+        const properCasePattern = /^[A-Z][a-zA-Z]+(?:\s+[A-Z][a-zA-Z]+){1,3}$/;
+        return properCasePattern.test(l);
+      };
+      const candidate = lines.find(isLikelyName);
+      if (candidate) extractedName = candidate;
+    }
+
+    // Fallback: derive from email local-part
+    if (!extractedName) {
+      extractedName = nameFromEmail(emails[0]);
+    }
+
+    // Final cleanup
+    const name = extractedName ? titleCase(extractedName) : "";
+
     const skillsList = [
       "python",
       "javascript",
@@ -96,6 +142,7 @@ export async function parseResumeBuffer(
 
     return {
       rawText: text,
+      name,
       emails,
       phones,
       skills: [...new Set(foundSkills)],

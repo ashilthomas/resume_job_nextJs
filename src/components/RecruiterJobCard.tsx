@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Briefcase, MapPin, Calendar, Tag } from "lucide-react";
 import Link from "next/link";
 
@@ -8,21 +11,44 @@ interface RecruiterJobCardProps {
   location?: string;
   skills?: string[];
   createdAt?: string | Date;
+  onDeleted?: (id: string) => void;
 }
 
-export default function RecruiterJobCard({ id, title, company, location, skills = [], createdAt }: RecruiterJobCardProps) {
+export default function RecruiterJobCard({ id, title, company, location, skills = [], createdAt, onDeleted }: RecruiterJobCardProps) {
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   // Format date if available
   const formattedDate = createdAt ? new Date(createdAt).toLocaleDateString() : 'N/A';
   
   return (
-    <div className="p-6 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+    <div className="p-6 bg-background rounded-2xl border border-light shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Briefcase className="text-blue-600" size={20} />
-          <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+          <Briefcase className="text-primary" size={20} />
+          <h3 className="text-xl font-semibold text-foreground">{title}</h3>
         </div>
+        <button
+          className="text-sm px-3 py-1.5 rounded-lg border border-light text-foreground hover:bg-foreground/5 disabled:opacity-60"
+          onClick={async () => {
+            if (!confirm("Delete this job? This action cannot be undone.")) return;
+            setDeleteError(null);
+            setDeleting(true);
+            try {
+              const res = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to delete job');
+              onDeleted?.(id);
+            } catch (err: any) {
+              setDeleteError(err.message || 'Failed to delete job');
+            } finally {
+              setDeleting(false);
+            }
+          }}
+          disabled={deleting}
+        >
+          {deleting ? 'Deleting...' : 'Delete'}
+        </button>
       </div>
-
       <div className="space-y-3 mb-4">
         <p className="text-gray-600 font-medium">{company}</p>
         
@@ -68,6 +94,11 @@ export default function RecruiterJobCard({ id, title, company, location, skills 
           Find Matches →
         </Link>
       </div>
+      {deleteError && (
+        <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-destructive text-sm">
+          {deleteError}
+        </div>
+      )}
     </div>
   );
 }

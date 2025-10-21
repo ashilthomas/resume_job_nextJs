@@ -50,10 +50,10 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
       <button
         onClick={handleUpload}
         disabled={!file || loading}
-        className={`mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white transition ${
+        className={`mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white transition cursor-pointer ${
           loading
-            ? "bg-background cursor-not-allowed"
-            : "bg-background hover:bg-blue-700"
+            ? "bg-secondary  cursor-not-allowed"
+            : "bg-secondary  hover:bg-foreground "
         }`}
       >
         {loading ? (

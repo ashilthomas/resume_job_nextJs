@@ -5,7 +5,8 @@ export default function HomePage() {
   return (
     <section className="flex flex-col items-center justify-center text-center py-20">
       <h1 className="text-4xl md:text-5xl text-foreground font-extrabold mb-6">
-        AI Resume & Job Match Portal
+        <span className="">
+       AI Resume</span> & Job Match Portal
       </h1>
 
       <p className="text-lg text-gray-600 max-w-2xl mb-8 ">
@@ -15,7 +16,7 @@ export default function HomePage() {
 
       <Link 
         href="/upload"
-        className="px-6 py-3 bg-foreground text-background  font-semibold rounded-xl shadow  transition"
+        className="px-6 py-3 bg-secondary text-background  font-semibold rounded-xl shadow  transition"
       >
         Get Started – Upload Resume
       </Link>
