@@ -23,7 +23,7 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center space-x-2">
           <span className="text-2xl font-extrabold bg-gradient-to-r text-foreground  bg-clip-text">
-            AI Resume Portal
+            AI Resume <span className="text-secondary">Portal</span> 
           </span>
         </Link>
 
@@ -35,8 +35,8 @@ export default function Header() {
               href={item.href}
               className={`transition-colors ${
                 pathname === item.href
-                  ? "text-blue-600 font-semibold"
-                  : "text-gray-600 hover:text-blue-600"
+                  ? "text-secondary font-semibold"
+                  : "text-foreground hover:text-blue-600"
               }`}
             >
               {item.label}
@@ -65,7 +65,7 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`block px-2 py-2 rounded-lg transition-colors ${
                   pathname === item.href
-                    ? "text-blue-600 font-semibold bg-blue-50"
+                    ? "text-secondary font-semibold bg-blue-50"
                     : "text-gray-600 hover:text-blue-600 hover:bg-gray-50"
                 }`}
               >

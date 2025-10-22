@@ -20,7 +20,7 @@ export default function ATSScoreGauge({ score }: ATSScoreGaugeProps) {
             cx="64"
             cy="64"
             r="56"
-            stroke="#2563eb"
+            stroke="#14B45A"
             strokeWidth="10"
             fill="none"
             strokeDasharray="351.86"
@@ -28,7 +28,7 @@ export default function ATSScoreGauge({ score }: ATSScoreGaugeProps) {
             strokeLinecap="round"
           />
         </svg>
-        <span className="text-3xl font-bold text-blue-600">{score}%</span>
+        <span className="text-3xl font-bold text-secondary ">{score}%</span>
       </div>
       <p className="text-sm text-gray-500 mt-1">Optimization readiness</p>
     </div>

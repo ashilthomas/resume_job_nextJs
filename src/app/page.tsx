@@ -5,7 +5,7 @@ export default function HomePage() {
   return (
     <section className="flex flex-col items-center justify-center text-center py-20">
       <h1 className="text-4xl md:text-5xl text-foreground font-extrabold mb-6">
-        <span className="">
+        <span className="text-secondary">
        AI Resume</span> & Job Match Portal
       </h1>
 

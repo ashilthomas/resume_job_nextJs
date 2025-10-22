@@ -31,7 +31,8 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
         htmlFor="resumeUpload"
         className="cursor-pointer flex flex-col items-center justify-center space-y-3"
       >
-        <Upload className="text-blue-600 w-10 h-10" />
+        <Upload className="text-secondary w-10 h-10" />
+
         <p className="text-gray-700 font-medium">
           {file ? file.name : "Drag & Drop or Click to Upload"}
         </p>

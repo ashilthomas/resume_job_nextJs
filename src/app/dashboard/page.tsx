@@ -73,7 +73,7 @@ export default function DashboardPage() {
       <p className="font-medium">Error</p>
       <p>{error}</p>
       {error.includes('No resumes found') && (
-        <a href="/upload" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+        <a href="/upload" className="mt-4 inline-block px-4 py-2 bg-foreground text-white rounded-lg hover:bg-blue-700">
           Upload Resume
         </a>
       )}

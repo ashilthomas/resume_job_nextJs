@@ -44,7 +44,7 @@ export default function RecruiterDashboard() {
         title="Recruiter Dashboard"
         subtitle="Manage your job postings and track candidate applications."
         action={
-          <Link href="/recruiter/add-job" className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+          <Link href="/recruiter/add-job" className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg font-medium hover:bg-blue-700 transition">
             <PlusCircle size={18} />
             Post New Job
           </Link>
@@ -80,7 +80,7 @@ export default function RecruiterDashboard() {
             <p className="mb-4">No jobs posted yet.</p>
             <Link 
               href="/recruiter/add-job"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 text-secondary   rounded-lg hover:bg-blue-700 transition-colors"
             >
               Add Your First Job
             </Link>

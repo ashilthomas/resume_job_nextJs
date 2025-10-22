@@ -21,7 +21,7 @@ export default function ResumeCard({ name, email, skills, atsScore }: ResumeCard
               {skills.map((skill, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 text-sm font-medium bg-blue-50 text-blue-700 rounded-full"
+                  className="px-3 py-1 text-sm font-medium bg-blue-50 text-secondary rounded-full"
                 >
                   {skill}
                 </span>

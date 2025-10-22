@@ -73,7 +73,7 @@ export default function JobsPage() {
                     {job.requiredSkills.slice(0, 3).map((skill, index) => (
                       <span 
                         key={index} 
-                        className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        className="px-3 py-1 bg-blue-100 text-secondary rounded-full text-sm"
                       >
                         {skill}
                       </span>
@@ -92,7 +92,7 @@ export default function JobsPage() {
                 
                 <Link 
                   href={`/jobs/${job._id}`}
-                  className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-secondary text-white rounded-lg hover:bg-blue-700 transition"
                 >
                   View Details
                   <ArrowRight size={16} />

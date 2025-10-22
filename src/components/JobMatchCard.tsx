@@ -14,7 +14,7 @@ export default function JobMatchCard({ title, company, score, missingSkills }: J
     <div className="p-6 bg-white border border-gray-100 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="text-xl font-semibold text-blue-700">{title}</h3>
+          <h3 className="text-xl font-semibold text-foreground">{title}</h3>
           <p className="text-gray-500">{company}</p>
         </div>
         <div className="text-right">
