@@ -1,7 +1,10 @@
 import Header from "@/components/Header";
 import { Poppins } from 'next/font/google'
 import "./globals.css";
+import {
+  ClerkProvider,
 
+} from '@clerk/nextjs'
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['400', '600', '700'],
@@ -15,9 +18,11 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
+    <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
     <html lang="en" className={poppins.variable}>
       <body className="font-poppins bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900 min-h-screen flex flex-col">
         <Header />
+       
         <main className="flex-grow max-w-7xl mx-auto w-full px-6 py-10">{children}</main>
         <footer className="border-t border-gray-200 bg-white py-8 mt-auto">
           <div className="max-w-7xl mx-auto text-center text-sm text-gray-500 px-4">
@@ -37,5 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </footer>
       </body>
     </html>
+    </ClerkProvider>
+
   );
 }

@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
+import {
+
+  SignInButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from '@clerk/nextjs'
 
 const navItems = [
   { href: "/", label: "Home" },
@@ -42,7 +50,19 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          <SignedOut>
+              <SignInButton />
+              <SignUpButton>
+                <button className="bg-secondary text-background text-ceramic-white rounded-full font-medium text-sm sm:text-base   px-4 py-2 sm:px-5 cursor-pointer">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
         </nav>
+       
 
         {/* Mobile Menu Button */}
         <button

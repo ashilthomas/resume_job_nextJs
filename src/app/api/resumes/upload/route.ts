@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { parseResumeBuffer } from "@/lib/parser";
 import Resume from "@/lib/models/Resume";
 import { connectDB } from "@/lib/db";
+import { auth } from "@clerk/nextjs";
 
 // Ensure this route runs on the Node.js runtime (not Edge)
 export const runtime = "nodejs";
@@ -16,6 +17,14 @@ export const config = {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    
+    // Get the authenticated user ID from Clerk
+    const { userId } = auth();
+    
+    // If no authenticated user, return unauthorized
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     const formData = await req.formData();
     const file = formData.get("file") as File;
@@ -28,17 +37,15 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const parsed = await parseResumeBuffer(buffer, file.name, file.type);
 
-    // Save to database
+    // Save to database with user ID
     const resume = await Resume.create({
       fileName: file.name,
       filePath: null,
       parsed,
       skills: parsed.skills,
+      userId, // Add the authenticated user ID
       atsScore: Math.floor(Math.random() * 40 + 60), // dummy ATS score 60–100
     });
-
-    // Optionally: delete file after parsing to save space
-    // fs.unlinkSync(filePath);
 
     return NextResponse.json({ success: true, resume });
   } catch (err: any) {

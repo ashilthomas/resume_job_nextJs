@@ -5,6 +5,7 @@ export interface IResume extends Document {
   filePath: string | null;
   parsed: any;
   skills: string[];
+  userId: string;
   atsScore: number;
   createdAt: Date;
 }
@@ -15,6 +16,7 @@ const ResumeSchema = new Schema<IResume>({
   parsed: { type: Schema.Types.Mixed, required: true },
   skills: { type: [String], default: [] },
   atsScore: { type: Number, required: true },
+  userId: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 
