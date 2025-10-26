@@ -1,13 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
-
-export async function GET() {
+import { getAuth } from "@clerk/nextjs/server";
+// GET /api/jobs
+// Returns all jobs available for employers
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
     
-    // Get all jobs, sorted by most recent first
-    const jobs = await Job.find({}).sort({ createdAt: -1 }).lean();
+    const { userId } = getAuth(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
+    // Get all jobs for the current user, sorted by most recent first
+    const jobs = await Job.find({ userId }).sort({ createdAt: -1 }).lean();
     
     return NextResponse.json({ jobs });
   } catch (error: any) {

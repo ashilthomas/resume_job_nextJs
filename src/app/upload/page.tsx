@@ -3,6 +3,7 @@
 import { useState } from "react";
 import FileUpload from "@/components/FileUpload";
 import { CheckCircle2 } from "lucide-react";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export default function UploadPage() {
   const [result, setResult] = useState<any>(null);
@@ -14,7 +15,21 @@ export default function UploadPage() {
         Upload your resume to analyze skills, ATS score, and job match insights.
       </p>
 
-      <FileUpload onUpload={setResult} />
+      <SignedIn>
+        <FileUpload onUpload={setResult} uploadUrl="/api/candidate/resumes/upload" />
+      </SignedIn>
+
+      <SignedOut>
+        <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 space-y-4 text-center">
+          <h2 className="text-xl font-semibold text-gray-900">Sign in to upload your resume</h2>
+          <p className="text-gray-600">You need to be signed in to analyze and save resumes.</p>
+          <SignInButton mode="modal">
+            <button className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white bg-foreground hover:bg-blue-700">
+              Sign In
+            </button>
+          </SignInButton>
+        </div>
+      </SignedOut>
 
       {result && (
         <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100 space-y-4">
@@ -25,30 +40,16 @@ export default function UploadPage() {
 
           <div className="grid md:grid-cols-2 gap-4 text-gray-700">
             <div>
-              <p className="font-medium text-gray-900 mb-1">Key Skills</p>
-              <div className="flex flex-wrap gap-2">
-                {result.skills?.map((skill: string, idx: number) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 text-sm bg-blue-50 text-blue-700 rounded-full font-medium"
-                  >
-                    {skill}
-                  </span>
+              <p className="font-medium">Top Skills Detected</p>
+              <ul className="list-disc pl-5 mt-2">
+                {(result?.skills || []).slice(0, 6).map((skill: string, idx: number) => (
+                  <li key={idx}>{skill}</li>
                 ))}
-              </div>
+              </ul>
             </div>
-
             <div>
-              <p className="font-medium text-gray-900 mb-1">ATS Score</p>
-              <div className="relative w-full bg-gray-200 h-3 rounded-full">
-                <div
-                  className="absolute top-0 left-0 h-3 bg-green-600 rounded-full"
-                  style={{ width: `${result.atsScore || 0}%` }}
-                />
-              </div>
-              <p className="text-sm text-gray-600 mt-1">
-                {result.atsScore ? `${result.atsScore}% match` : "N/A"}
-              </p>
+              <p className="font-medium">ATS Score</p>
+              <p className="text-2xl font-bold text-green-600">{result?.atsScore ?? 0}</p>
             </div>
           </div>
         </div>

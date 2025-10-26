@@ -3,25 +3,25 @@ import { connectDB } from "@/lib/db";
 import Resume from "@/lib/models/Resume";
 import Job from "@/lib/models/Job";
 import { findTopJobMatches } from "@/lib/utils";
-
+import { requireCandidateUser } from "@/lib/auth";
+// GET /api/candidate/resumes/:id/matches
+// Returns job matches for a specific resume by ID for candidates
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   try {
-    await connectDB();
+    const user = await requireCandidateUser(req);
+    if (user instanceof NextResponse) return user;
+    const { userId } = user;
     
+    await connectDB();
     const resumeId = params.id;
     
-    // Find the resume by ID
-    const resume = await Resume.findById(resumeId).lean();
+    const resume = await Resume.findOne({ _id: resumeId, userId }).lean();
     if (!resume) {
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
     
-    // Get all jobs
     const jobs = await Job.find({}).lean();
-    
-    // Calculate job matches based on resume skills
     const jobMatches = findTopJobMatches(resume.skills, jobs);
-    
     return NextResponse.json({ jobMatches });
   } catch (error: any) {
     console.error("Error finding job matches:", error);

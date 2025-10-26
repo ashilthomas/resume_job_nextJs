@@ -34,10 +34,11 @@ export default function RecruiterJobCard({ id, title, company, location, skills 
             setDeleteError(null);
             setDeleting(true);
             try {
-              const res = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || 'Failed to delete job');
-              onDeleted?.(id);
+-              const res = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
++              const res = await fetch(`/api/recruiter/jobs/${id}`, { method: 'DELETE' });
+               const data = await res.json();
+               if (!res.ok) throw new Error(data.error || 'Failed to delete job');
+               onDeleted?.(id);
             } catch (err: any) {
               setDeleteError(err.message || 'Failed to delete job');
             } finally {
@@ -81,7 +82,7 @@ export default function RecruiterJobCard({ id, title, company, location, skills 
 
       <div className="flex items-center justify-between border-t border-gray-100 pt-4">
         <Link
-          href={`/api/jobs/${id}/candidates`}
+          href={`/jobs/${id}/candidates`}
           className="text-sm font-medium text-blue-600 hover:underline"
         >
           View Candidates

@@ -30,9 +30,17 @@ export default function JobDetailsPage() {
       try {
         setLoading(true);
         
-        const response = await fetch(`/api/jobs/${jobId}`);
-        if (!response.ok) throw new Error('Failed to fetch job details');
+        // Verify recruiter role before accessing recruiter job details
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'recruiter') {
+          router.replace('/');
+          return;
+        }
         
+        const response = await fetch(`/api/recruiter/jobs/${jobId}`);
+        if (!response.ok) throw new Error('Failed to fetch job details');
         const data = await response.json();
         setJob(data.job);
       } catch (err: any) {

@@ -5,32 +5,43 @@ import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import SectionHeader from "@/components/SectionHeader";
 import RecruiterJobCard from "@/components/RecruiterJobCard";
+import { useRouter } from "next/navigation";
 
 export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [jobs, setJobs] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    async function fetchJobs() {
+    async function ensureRecruiterAndFetch() {
       try {
         setLoading(true);
+
+        // Check role first
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'recruiter') {
+          router.push('/');
+          return;
+        }
         
-        const response = await fetch('/api/jobs');
+        // Then fetch recruiter-owned jobs
+        const response = await fetch('/api/recruiter/jobs');
         if (!response.ok) throw new Error('Failed to fetch jobs');
-        
         const data = await response.json();
         setJobs(data.jobs || []);
       } catch (err: any) {
-        console.error('Error fetching jobs:', err);
-        setError(err.message || 'Failed to load jobs');
+        console.error('Error loading recruiter dashboard:', err);
+        setError(err.message || 'Failed to load recruiter dashboard');
       } finally {
         setLoading(false);
       }
     }
     
-    fetchJobs();
-  }, []);
+    ensureRecruiterAndFetch();
+  }, [router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

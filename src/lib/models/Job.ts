@@ -6,6 +6,7 @@ export interface IJob extends Document {
   description: string;
   requiredSkills: string[];
   location: string;
+  userId: string;
   createdAt: Date;
 }
 
@@ -15,6 +16,7 @@ const JobSchema = new Schema<IJob>({
   description: String,
   requiredSkills: [String],
   location: String,
+  userId: { type: String, required: true },
   createdAt: { type: Date, default: Date.now },
 });
 

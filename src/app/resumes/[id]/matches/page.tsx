@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
 import JobMatchCard from "@/components/JobMatchCard";
+import { useRouter } from "next/navigation";
 
 export default function ResumeMatchesPage() {
   const params = useParams();
   const resumeId = params.id as string;
+  const router = useRouter();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -19,13 +21,22 @@ export default function ResumeMatchesPage() {
       try {
         setLoading(true);
         
+        // Verify candidate role before fetching matches
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'candidate') {
+          router.push('/');
+          return;
+        }
+        
         // Fetch the resume details
-        const resumeRes = await fetch(`/api/resumes/${resumeId}`);
+        const resumeRes = await fetch(`/api/candidate/resumes/${resumeId}`);
         if (!resumeRes.ok) throw new Error('Failed to fetch resume data');
         const resumeData = await resumeRes.json();
         
         // Fetch job matches for this resume
-        const matchesRes = await fetch(`/api/resumes/${resumeId}/matches`);
+        const matchesRes = await fetch(`/api/candidate/resumes/${resumeId}/matches`);
         if (!matchesRes.ok) throw new Error('Failed to fetch job matches');
         const matchesData = await matchesRes.json();
         
@@ -42,7 +53,7 @@ export default function ResumeMatchesPage() {
     if (resumeId) {
       fetchData();
     }
-  }, [resumeId]);
+  }, [resumeId, router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

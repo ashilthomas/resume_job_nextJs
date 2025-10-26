@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
 import { Building2, Briefcase, MapPin, Tag, FileText, Loader2, X } from "lucide-react";
@@ -67,7 +67,7 @@ export default function AddJobPage() {
             .map(skill => skill.trim())
             .filter(skill => skill !== "");
       
-      const response = await fetch("/api/jobs/create", {
+      const response = await fetch("/api/recruiter/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -105,6 +105,23 @@ export default function AddJobPage() {
     }
   };
 
+  useEffect(() => {
+    let cancelled = false;
+    async function checkRole() {
+      try {
+        const res = await fetch('/api/user/role');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && data.role !== 'recruiter') {
+          router.replace('/');
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    checkRole();
+    return () => { cancelled = true; };
+  }, []);
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <SectionHeader

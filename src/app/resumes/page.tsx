@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/SectionHeader";
+import { useRouter } from "next/navigation";
 
 type Resume = {
   _id: string;
@@ -21,13 +22,23 @@ export default function ResumesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchResumes() {
       try {
         setLoading(true);
         
-        const response = await fetch('/api/resumes');
+        // Verify candidate role before accessing resumes
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'candidate') {
+          router.push('/');
+          return;
+        }
+        
+        const response = await fetch('/api/candidate/resumes');
         if (!response.ok) throw new Error('Failed to fetch resumes');
         
         const data = await response.json();
@@ -41,7 +52,7 @@ export default function ResumesPage() {
     }
     
     fetchResumes();
-  }, []);
+  }, [router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

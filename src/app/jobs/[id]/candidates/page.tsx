@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import SectionHeader from "@/components/SectionHeader";
 
 type Candidate = {
@@ -24,6 +24,7 @@ type Job = {
 
 export default function JobCandidatesPage() {
   const params = useParams();
+  const router = useRouter();
   const jobId = params.id as string;
   
   const [loading, setLoading] = useState(true);
@@ -36,7 +37,16 @@ export default function JobCandidatesPage() {
       try {
         setLoading(true);
         
-        const response = await fetch(`/api/jobs/${jobId}/candidates`);
+        // Verify recruiter role before accessing candidates
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'recruiter') {
+          router.push('/');
+          return;
+        }
+
+        const response = await fetch(`/api/recruiter/jobs/${jobId}/candidates`);
         if (!response.ok) throw new Error('Failed to fetch candidates');
         
         const data = await response.json();
@@ -53,7 +63,7 @@ export default function JobCandidatesPage() {
     if (jobId) {
       fetchCandidates();
     }
-  }, [jobId]);
+  }, [jobId, router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -126,23 +136,20 @@ export default function JobCandidatesPage() {
                   <div className="flex flex-wrap gap-2 mb-4">
                     {candidate.skills.map((skill, index) => (
                       <span 
-                        key={index} 
-                        className={`px-3 py-1 rounded-full text-sm ${job.requiredSkills.includes(skill) 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'}`}
+                        key={index}
+                        className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm"
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
-                  
                   {candidate.missingSkills.length > 0 && (
                     <div>
                       <h4 className="font-medium mb-2">Missing Skills:</h4>
                       <div className="flex flex-wrap gap-2">
                         {candidate.missingSkills.map((skill, index) => (
-                          <span 
-                            key={index} 
+                          <span
+                            key={index}
                             className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm"
                           >
                             {skill}
@@ -156,7 +163,7 @@ export default function JobCandidatesPage() {
             ))}
           </div>
         ) : (
-          <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 text-center">
+          <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg text-gray-700">
             <p>No matching candidates found.</p>
           </div>
         )}

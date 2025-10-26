@@ -5,20 +5,31 @@ import SectionHeader from "@/components/SectionHeader";
 import ResumeCard from "@/components/ResumeCard";
 import JobMatchCard from "@/components/JobMatchCard";
 import { findTopJobMatches } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resume, setResume] = useState<any>(null);
   const [jobMatches, setJobMatches] = useState<any[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         
-        // Fetch the most recent resume
-        const resumeRes = await fetch('/api/resumes');
+        // Verify candidate role before fetching dashboard data
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'candidate') {
+          router.push('/');
+          return;
+        }
+        
+        // Fetch the most recent resume using candidate-protected API
+        const resumeRes = await fetch('/api/candidate/resumes');
         if (!resumeRes.ok) throw new Error('Failed to fetch resume data');
         const resumeData = await resumeRes.json();
         
@@ -28,18 +39,15 @@ export default function DashboardPage() {
           return;
         }
         
-        // Get the most recent resume
         const latestResume = resumeData.resumes[0];
         
-        // Fetch all jobs
-        const jobsRes = await fetch('/api/jobs');
+        // Fetch jobs via candidate-protected API
+        const jobsRes = await fetch('/api/candidate/jobs');
         if (!jobsRes.ok) throw new Error('Failed to fetch job data');
         const jobsData = await jobsRes.json();
         
-        // Calculate top job matches
         const topMatches = findTopJobMatches(latestResume.skills, jobsData.jobs || []);
         
-        // Extract name and email from parsed resume data
         const name = latestResume.parsed?.name || 'Candidate';
         const email = latestResume.parsed?.emails?.[0] || '';
         
@@ -60,7 +68,7 @@ export default function DashboardPage() {
     }
     
     fetchData();
-  }, []);
+  }, [router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

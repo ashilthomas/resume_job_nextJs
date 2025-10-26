@@ -37,8 +37,9 @@ export default function ResumeDetailsPage() {
       try {
         setLoading(true);
         
-        const response = await fetch(`/api/resumes/${resumeId}`);
-        if (!response.ok) throw new Error('Failed to fetch resume details');
+-        const response = await fetch(`/api/resumes/${resumeId}`);
++        const response = await fetch(`/api/candidate/resumes/${resumeId}`);
+         if (!response.ok) throw new Error('Failed to fetch resume details');
         
         const data = await response.json();
         setResume(data.resume);
@@ -53,7 +54,8 @@ export default function ResumeDetailsPage() {
     if (resumeId) {
       fetchResume();
     }
-  }, [resumeId]);
+-  }, [resumeId]);
++  }, [resumeId]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

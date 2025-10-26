@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import SectionHeader from "@/components/SectionHeader";
+import { useRouter } from "next/navigation";
 
 type Job = {
   _id: string;
@@ -24,9 +25,17 @@ export default function JobsPage() {
       try {
         setLoading(true);
         
-        const response = await fetch('/api/jobs');
-        if (!response.ok) throw new Error('Failed to fetch jobs');
+        // Verify recruiter role before accessing recruiter jobs
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'recruiter') {
+          router.replace('/');
+          return;
+        }
         
+        const response = await fetch('/api/recruiter/jobs');
+        if (!response.ok) throw new Error('Failed to fetch jobs');
         const data = await response.json();
         setJobs(data.jobs || []);
       } catch (err: any) {

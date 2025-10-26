@@ -4,9 +4,10 @@ import { Upload, FileText, Loader2 } from "lucide-react";
 
 interface FileUploadProps {
   onUpload: (result: any) => void;
+  uploadUrl?: string;
 }
 
-export default function FileUpload({ onUpload }: FileUploadProps) {
+export default function FileUpload({ onUpload, uploadUrl = "/api/candidate/resumes/upload" }: FileUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -17,7 +18,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
     try {
       const form = new FormData();
       form.append("file", file);
-      const res = await fetch("/api/resumes/upload", { method: "POST", body: form });
+      const res = await fetch(uploadUrl, { method: "POST", body: form });
       const data = await res.json();
       onUpload(data.resume);
     } finally {
@@ -31,8 +32,7 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
         htmlFor="resumeUpload"
         className="cursor-pointer flex flex-col items-center justify-center space-y-3"
       >
-        <Upload className="text-secondary w-10 h-10" />
-
+        <Upload className="text-blue-600 w-10 h-10" />
         <p className="text-gray-700 font-medium">
           {file ? file.name : "Drag & Drop or Click to Upload"}
         </p>
@@ -51,10 +51,10 @@ export default function FileUpload({ onUpload }: FileUploadProps) {
       <button
         onClick={handleUpload}
         disabled={!file || loading}
-        className={`mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white transition cursor-pointer ${
+        className={`mt-6 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium text-white transition ${
           loading
-            ? "bg-secondary  cursor-not-allowed"
-            : "bg-secondary  hover:bg-foreground "
+            ? "bg-foreground cursor-none"
+            : "bg-foreground hover:bg-blue-700"
         }`}
       >
         {loading ? (
