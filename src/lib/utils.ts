@@ -22,7 +22,7 @@ export function calculateJobMatch(candidateSkills: string[], jobRequiredSkills: 
 /**
  * Find top matching jobs for a candidate based on skills
  */
-export function findTopJobMatches(candidateSkills: string[], jobs: any[], limit = 5) {
+export function findTopJobMatches(candidateSkills: string[], jobs: Record<string, unknown>[], limit = 5) {
   if (!jobs.length) return [];
   
   const jobsWithScores = jobs.map(job => {

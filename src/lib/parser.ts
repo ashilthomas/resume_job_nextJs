@@ -28,11 +28,11 @@ async function extractTextFromBuffer(
         fs.writeFileSync(testFilePath, 'Dummy PDF content');
       }
       
-      const pdfParseModule: any = await import("pdf-parse");
-      const pdfParse: any = (pdfParseModule as any).default ?? pdfParseModule;
+      const pdfParseModule = await import("pdf-parse");
+      const pdfParse = pdfParseModule.default ?? pdfParseModule;
       const result = await pdfParse(fileBuffer);
       return (result && typeof result.text === "string") ? result.text : "";
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error("PDF parsing error:", err);
       throw new Error(`Failed to extract PDF text: ${err?.message || "Unknown error"}`);
     }
@@ -44,7 +44,7 @@ async function extractTextFromBuffer(
     mimeType.includes("officedocument")
   ) {
     const mammothModule = await import("mammoth");
-    const mammoth: any = (mammothModule as any).default ?? (mammothModule as any);
+    const mammoth = mammothModule.default ?? mammothModule;
     const result = await mammoth.extractRawText({ buffer: fileBuffer });
     return result.value as string;
   }
@@ -102,7 +102,7 @@ export async function parseResumeBuffer(
     };
 
     // Try explicit "Name:" pattern
-    let nameMatch = text.match(/(?:^|\n)\s*Name\s*[:\-]\s*(.+)/i);
+    const nameMatch = text.match(/(?:^|\n)\s*Name\s*[:\-]\s*(.+)/i);
     let extractedName = nameMatch ? nameMatch[1].split(/\r?\n/)[0].trim() : "";
 
     // Fallback: first plausible proper-case line
@@ -148,7 +148,7 @@ export async function parseResumeBuffer(
       skills: [...new Set(foundSkills)],
       summary: text.split("\n").slice(0, 5).join(" "),
     };
-  } catch (err: any) {
+  } catch (err: Error | unknown) {
     console.error("Resume parsing error:", err);
     throw new Error(`Failed to parse resume: ${err?.message || "Unknown error"}`);
   }
