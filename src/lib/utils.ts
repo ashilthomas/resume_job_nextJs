@@ -22,7 +22,12 @@ export function calculateJobMatch(candidateSkills: string[], jobRequiredSkills: 
 /**
  * Find top matching jobs for a candidate based on skills
  */
-export function findTopJobMatches(candidateSkills: string[], jobs: Record<string, unknown>[], limit = 5) {
+export interface JobLike {
+  requiredSkills: string[];
+  [key: string]: unknown;
+}
+
+export function findTopJobMatches(candidateSkills: string[], jobs: JobLike[], limit = 5) {
   if (!jobs.length) return [];
   
   const jobsWithScores = jobs.map(job => {
@@ -31,7 +36,7 @@ export function findTopJobMatches(candidateSkills: string[], jobs: Record<string
       ...job,
       score,
       missingSkills
-    };
+    } as JobLike & { score: number; missingSkills: string[] };
   });
   
   // Sort by score (highest first) and take the top matches

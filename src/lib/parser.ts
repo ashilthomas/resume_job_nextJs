@@ -32,9 +32,10 @@ async function extractTextFromBuffer(
       const pdfParse = pdfParseModule.default ?? pdfParseModule;
       const result = await pdfParse(fileBuffer);
       return (result && typeof result.text === "string") ? result.text : "";
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
       console.error("PDF parsing error:", err);
-      throw new Error(`Failed to extract PDF text: ${err?.message || "Unknown error"}`);
+      const message = err instanceof Error ? err.message : "Unknown error";
+      throw new Error(`Failed to extract PDF text: ${message}`);
     }
   }
 
@@ -148,8 +149,9 @@ export async function parseResumeBuffer(
       skills: [...new Set(foundSkills)],
       summary: text.split("\n").slice(0, 5).join(" "),
     };
-  } catch (err: Error | unknown) {
+  } catch (err: unknown) {
     console.error("Resume parsing error:", err);
-    throw new Error(`Failed to parse resume: ${err?.message || "Unknown error"}`);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    throw new Error(`Failed to parse resume: ${message}`);
   }
 }
