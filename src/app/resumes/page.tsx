@@ -24,6 +24,21 @@ export default function ResumesPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const router = useRouter();
 
+  async function deleteResume(id: string) {
+    const confirmDelete = window.confirm("Delete this resume? This cannot be undone.");
+    if (!confirmDelete) return;
+    try {
+      const res = await fetch(`/api/candidate/resumes/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || 'Failed to delete resume');
+      }
+      setResumes(prev => prev.filter(r => r._id !== id));
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete resume');
+    }
+  }
+
   useEffect(() => {
     async function fetchResumes() {
       try {
@@ -132,6 +147,13 @@ export default function ResumesPage() {
                     Find Job Matches
                     <ArrowRight size={16} />
                   </Link>
+
+                  <button
+                    onClick={() => deleteResume(resume._id)}
+                    className="w-full px-4 py-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition"
+                  >
+                    Delete Resume
+                  </button>
                 </div>
               </div>
             </div>

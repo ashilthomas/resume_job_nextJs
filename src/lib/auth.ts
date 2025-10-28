@@ -30,37 +30,7 @@ export async function getUserWithRole(req: NextRequest) {
   };
 }
 
-// Middleware to protect recruiter routes
-export async function requireRecruiter(req: NextRequest) {
-  const user = await getUserWithRole(req);
-  
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
-  if (user.role !== "recruiter") {
-    return NextResponse.json({ error: "Forbidden: Recruiter access required" }, { status: 403 });
-  }
-  
-  return null; // Continue with the request
-}
-
-// Middleware to protect candidate routes
-export async function requireCandidate(req: NextRequest) {
-  const user = await getUserWithRole(req);
-  
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  
-  if (user.role !== "candidate") {
-    return NextResponse.json({ error: "Forbidden: Candidate access required" }, { status: 403 });
-  }
-  
-  return null; // Continue with the request
-}
-
-// New helpers that return user object or NextResponse error
+// Authentication helpers that return user object or NextResponse error
 export async function requireRecruiterUser(req: NextRequest) {
   const user = await getUserWithRole(req);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

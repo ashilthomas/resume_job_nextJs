@@ -29,6 +29,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
 
+    // Edge case: prevent duplicate uploads by filename for the same user
+    const existing = await Resume.findOne({ userId, fileName: file.name }).lean();
+    if (existing) {
+      return NextResponse.json(
+        { error: "A resume with this filename already exists. Please delete it before uploading again." },
+        { status: 409 }
+      );
+    }
+
     const buffer = Buffer.from(await file.arrayBuffer());
     const parsed = await parseResumeBuffer(buffer, file.name, file.type);
 

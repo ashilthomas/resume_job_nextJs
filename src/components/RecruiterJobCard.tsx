@@ -34,11 +34,10 @@ export default function RecruiterJobCard({ id, title, company, location, skills 
             setDeleteError(null);
             setDeleting(true);
             try {
--              const res = await fetch(`/api/jobs/${id}`, { method: 'DELETE' });
-+              const res = await fetch(`/api/recruiter/jobs/${id}`, { method: 'DELETE' });
-               const data = await res.json();
-               if (!res.ok) throw new Error(data.error || 'Failed to delete job');
-               onDeleted?.(id);
+              const res = await fetch(`/api/recruiter/jobs/${id}`, { method: 'DELETE' });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Failed to delete job');
+              onDeleted?.(id);
             } catch (err: any) {
               setDeleteError(err.message || 'Failed to delete job');
             } finally {

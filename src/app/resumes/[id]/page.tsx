@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Briefcase } from "lucide-react";
 import SectionHeader from "@/components/SectionHeader";
@@ -27,19 +27,29 @@ type Resume = {
 export default function ResumeDetailsPage() {
   const params = useParams();
   const resumeId = params.id as string;
+  const router = useRouter();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [resume, setResume] = useState<Resume | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     async function fetchResume() {
       try {
         setLoading(true);
         
--        const response = await fetch(`/api/resumes/${resumeId}`);
-+        const response = await fetch(`/api/candidate/resumes/${resumeId}`);
-         if (!response.ok) throw new Error('Failed to fetch resume details');
+        // Verify candidate role before accessing resume details
+        const roleRes = await fetch('/api/user/role');
+        if (!roleRes.ok) throw new Error('Failed to verify user role');
+        const roleData = await roleRes.json();
+        if (roleData.role !== 'candidate') {
+          router.push('/');
+          return;
+        }
+        
+        const response = await fetch(`/api/candidate/resumes/${resumeId}`);
+        if (!response.ok) throw new Error('Failed to fetch resume details');
         
         const data = await response.json();
         setResume(data.resume);
@@ -54,8 +64,7 @@ export default function ResumeDetailsPage() {
     if (resumeId) {
       fetchResume();
     }
--  }, [resumeId]);
-+  }, [resumeId]);
+  }, [resumeId, router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">
@@ -74,6 +83,25 @@ export default function ResumeDetailsPage() {
       Resume not found
     </div>
   );
+
+  async function handleDelete() {
+    if (!resume?._id || deleting) return;
+    const confirmDelete = window.confirm("Delete this resume? This cannot be undone.");
+    if (!confirmDelete) return;
+    try {
+      setDeleting(true);
+      const res = await fetch(`/api/candidate/resumes/${resume._id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const payload = await res.json().catch(() => ({}));
+        throw new Error(payload.error || 'Failed to delete resume');
+      }
+      router.push('/resumes');
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete resume');
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -196,6 +224,14 @@ export default function ResumeDetailsPage() {
                 <span className="font-medium">Back to All Resumes</span>
                 <ArrowRight size={18} />
               </Link>
+
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className={`w-full px-4 py-2 rounded-lg transition ${deleting ? 'bg-red-200 text-red-500' : 'bg-red-50 text-red-700 hover:bg-red-100'}`}
+              >
+                {deleting ? 'Deleting…' : 'Delete Resume'}
+              </button>
             </div>
           </div>
         </div>
