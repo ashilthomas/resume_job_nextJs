@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import Resume from "@/lib/models/Resume";
-import Job from "@/lib/models/Job";
+import Resume, { IResume } from "@/lib/models/Resume";
+import Job, { IJob } from "@/lib/models/Job";
 import { findTopJobMatches } from "@/lib/utils";
 import { requireCandidateUser } from "@/lib/auth";
 // GET /api/candidate/resumes/:id/matches
@@ -18,13 +18,19 @@ export async function GET(
     await connectDB();
     const { id: resumeId } = await context.params;
     
-    const resume = await Resume.findOne({ _id: resumeId, userId }).lean();
+    const resume = await Resume.findOne({ _id: resumeId, userId }).lean<IResume>();
     if (!resume) {
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
     
-    const jobs = await Job.find({}).lean();
-    const jobMatches = findTopJobMatches(resume.skills, jobs);
+    const jobs = await Job.find({}).lean<IJob[]>();
+    const jobMatches = findTopJobMatches(
+      resume.skills ?? [],
+      jobs.map((j): { requiredSkills: string[]; [key: string]: unknown } => ({
+        ...j,
+        requiredSkills: j.requiredSkills ?? [],
+      }))
+    );
     return NextResponse.json({ jobMatches });
   } catch (error: unknown) {
     console.error("Error finding job matches:", error);

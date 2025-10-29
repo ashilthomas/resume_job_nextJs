@@ -4,7 +4,11 @@ import Job from "@/lib/models/Job";
 import { getAuth } from "@clerk/nextjs/server";
 // GET /api/jobs/:id
 // Returns a specific job by ID for employers
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     await connectDB();
     
@@ -13,7 +17,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const jobId = params.id;
+    const jobId = id;
     
     const job = await Job.findOne({ _id: jobId, userId }).lean();
     if (!job) {
@@ -31,7 +35,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     await connectDB();
 
@@ -40,7 +48,7 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const jobId = params.id;
+    const jobId = id;
     const deleted = await Job.findOneAndDelete({ _id: jobId, userId });
     if (!deleted) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });

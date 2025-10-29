@@ -1,35 +1,40 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
-import Job from "@/lib/models/Job";
-import Resume from "@/lib/models/Resume";
+import Job, { IJob } from "@/lib/models/Job";
+import Resume, { IResume } from "@/lib/models/Resume";
 import { calculateJobMatch } from "@/lib/utils";
 import { requireRecruiterUser } from "@/lib/auth";
 //recruiter job candidates retrive using jobId and recruiter userId
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireRecruiterUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const jobId = params.id;
+    const jobId = id;
     
     // Ensure this job belongs to the recruiter
-    const job = await Job.findOne({ _id: jobId, userId }).lean();//find job using jobId and recruiter userId
+    const job = await Job.findOne({ _id: jobId, userId }).lean<IJob>();//find job using jobId and recruiter userId
     if (!job) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
     
     // Consider all candidate resumes (global pool)
-    const resumes = await Resume.find({}).lean();//find all resumes
+    const resumes = await Resume.find({}).lean<IResume[]>();//find all resumes
     
-    const candidates = resumes.map(resume => {
-      const { score, missingSkills } = calculateJobMatch(resume.skills, job.requiredSkills);
+    const candidates = resumes.map((resume) => {
+      const { score, missingSkills } = calculateJobMatch(resume.skills ?? [], job.requiredSkills ?? []);
       return {
-        resumeId: resume._id,
+        // _id exists on documents; when using lean<IResume[]>(), TypeScript keeps it as unknown. Cast to string for API payload.
+        resumeId: String((resume as { _id?: unknown })._id ?? ""),
         name: resume.parsed?.name || 'Candidate',
         email: resume.parsed?.emails?.[0] || '',
-        skills: resume.skills,
+        skills: resume.skills ?? [],
         atsScore: resume.atsScore,
         matchScore: score,
         missingSkills
@@ -46,17 +51,4 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       { status: 500 }
     );
   }
-}//explane logic 
-//1. first find job using jobId and recruiter userId
-//2. if job not found return error
-//3. if job found then find all resumes
-//4. for each resume calculate match score using calculateJobMatch function
-//5. sort candidates by match score in descending order
-//6. return job and candidates
-// what si this api need?
-// this api need jobId and recruiter userId to find candidates for that job
- // this api return job and candidates with match score  
- // job contain job details and candidates contain resume details with match score
- // candidates contain resumeId, name, email, skills, atsScore, matchScore, missingSkills
- // missingSkills contain skills that job required but resume not have
- /// this api help recruiter to find candidates for their job
+}

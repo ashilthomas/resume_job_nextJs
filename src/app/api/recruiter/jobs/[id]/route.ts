@@ -3,14 +3,18 @@ import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { requireRecruiterUser } from "@/lib/auth";
 //data single retirive using jobId and recruiter userId
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireRecruiterUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const jobId = params.id;
+    const jobId = id;
     const job = await Job.findOne({ _id: jobId, userId }).lean();
     if (!job) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
@@ -26,14 +30,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 //recruiter job update using jobId and recruiter userIdre
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireRecruiterUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const jobId = params.id;
+    const jobId = id;
     const body = await req.json();
     
     if (!body.title || !body.company || !body.description) {
@@ -69,14 +77,18 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   }
 }
 //delete job reacurter using jobId and recruiter userId
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireRecruiterUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
 
     await connectDB();
-    const jobId = params.id;
+    const jobId = id;
     const deleted = await Job.findOneAndDelete({ _id: jobId, userId });
     if (!deleted) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
