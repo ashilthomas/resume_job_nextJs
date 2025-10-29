@@ -21,10 +21,14 @@ export async function GET() {
     const resumes = await Resume.find({ userId }).sort({ createdAt: -1 }).lean();
     
     return NextResponse.json({ resumes });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching resumes:", error);
+    const message =
+      typeof error === "object" && error !== null && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : "Failed to fetch resumes";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch resumes" },
+      { error: message },
       { status: 500 }
     );
   }
