@@ -19,6 +19,7 @@ export default function JobsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [jobs, setJobs] = useState<Job[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchJobs() {
@@ -38,16 +39,16 @@ export default function JobsPage() {
         if (!response.ok) throw new Error('Failed to fetch jobs');
         const data = await response.json();
         setJobs(data.jobs || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching jobs:', err);
-        setError(err.message || 'Failed to load jobs');
+        setError(err instanceof Error ? err.message : 'Failed to load jobs');
       } finally {
         setLoading(false);
       }
     }
     
     fetchJobs();
-  }, []);
+  }, [router]);
 
   if (loading) return (
     <div className="flex justify-center items-center h-64">

@@ -17,10 +17,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
     return NextResponse.json({ resume });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching resume:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch resume";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch resume" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -40,10 +41,11 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
     }
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting resume:", error);
+    const message = error instanceof Error ? error.message : "Failed to delete resume";
     return NextResponse.json(
-      { error: error.message || "Failed to delete resume" },
+      { error: message },
       { status: 500 }
     );
   }

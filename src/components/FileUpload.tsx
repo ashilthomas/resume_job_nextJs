@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Upload, FileText, Loader2 } from "lucide-react";
 
 interface FileUploadProps {
-  onUpload: (result: any) => void;
+  onUpload: (result: { success: boolean; data?: unknown; error?: string }) => void;
   uploadUrl?: string;
 }
 

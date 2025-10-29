@@ -30,7 +30,7 @@ export function useRequireRole(requiredRole: Role) {
             return;
           }
         }
-      } catch (error) {
+      } catch {
         if (!cancelled) router.push('/');
       } finally {
         if (!cancelled) setLoading(false);

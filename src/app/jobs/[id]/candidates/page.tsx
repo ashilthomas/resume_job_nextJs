@@ -52,9 +52,9 @@ export default function JobCandidatesPage() {
         const data = await response.json();
         setJob(data.job);
         setCandidates(data.candidates || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching candidates:', err);
-        setError(err.message || 'Failed to load candidates');
+        setError(err instanceof Error ? err.message : 'Failed to load candidates');
       } finally {
         setLoading(false);
       }

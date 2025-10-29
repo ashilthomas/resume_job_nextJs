@@ -6,7 +6,15 @@ import { CheckCircle2 } from "lucide-react";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export default function UploadPage() {
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{
+    success: boolean;
+    data?: {
+      resumeId: string;
+      fileName: string;
+      atsScore: number;
+    };
+    error?: string;
+  } | null>(null);
 
   return (
     <div className="max-w-3xl mx-auto p-8 space-y-8">

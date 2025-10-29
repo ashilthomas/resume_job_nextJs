@@ -10,8 +10,18 @@ import { useRouter } from "next/navigation";
 export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resume, setResume] = useState<any>(null);
-  const [jobMatches, setJobMatches] = useState<any[]>([]);
+  const [resume, setResume] = useState<{
+    name: string;
+    email?: string;
+    skills: string[];
+    atsScore: number;
+  } | null>(null);
+  const [jobMatches, setJobMatches] = useState<Array<{
+    title: string;
+    company: string;
+    score: number;
+    missingSkills?: string[];
+  }>>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,9 +69,9 @@ export default function DashboardPage() {
         });
         
         setJobMatches(topMatches);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Dashboard data fetch error:', err);
-        setError(err.message || 'Failed to load dashboard data');
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
@@ -103,7 +113,7 @@ export default function DashboardPage() {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches for {firstName}</h2>
         {jobMatches.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-6">
-            {jobMatches.map((job: any, idx: number) => (
+            {jobMatches.map((job, idx: number) => (
               <JobMatchCard 
                 key={idx} 
                 title={job.title} 

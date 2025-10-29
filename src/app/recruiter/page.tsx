@@ -10,7 +10,15 @@ import { useRouter } from "next/navigation";
 export default function RecruiterDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Array<{
+    _id: string;
+    title: string;
+    company: string;
+    location: string;
+    description: string;
+    requiredSkills: string[];
+    createdAt: string;
+  }>>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,9 +40,9 @@ export default function RecruiterDashboard() {
         if (!response.ok) throw new Error('Failed to fetch jobs');
         const data = await response.json();
         setJobs(data.jobs || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error loading recruiter dashboard:', err);
-        setError(err.message || 'Failed to load recruiter dashboard');
+        setError(err instanceof Error ? err.message : 'Failed to load recruiter dashboard');
       } finally {
         setLoading(false);
       }

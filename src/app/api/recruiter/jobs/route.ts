@@ -12,10 +12,11 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const jobs = await Job.find({ userId }).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ jobs });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching recruiter jobs:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch jobs";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch jobs" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -47,10 +48,11 @@ export async function POST(req: NextRequest) {
     });
     
     return NextResponse.json({ success: true, job });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating job:", error);
+    const message = error instanceof Error ? error.message : "Failed to create job";
     return NextResponse.json(
-      { error: error.message || "Failed to create job" },
+      { error: message },
       { status: 500 }
     );
   }

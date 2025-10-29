@@ -38,8 +38,8 @@ export default function RecruiterJobCard({ id, title, company, location, skills 
               const data = await res.json();
               if (!res.ok) throw new Error(data.error || 'Failed to delete job');
               onDeleted?.(id);
-            } catch (err: any) {
-              setDeleteError(err.message || 'Failed to delete job');
+            } catch (err: unknown) {
+              setDeleteError(err instanceof Error ? err.message : 'Failed to delete job');
             } finally {
               setDeleting(false);
             }

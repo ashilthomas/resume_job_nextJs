@@ -17,10 +17,11 @@ export async function GET(req: NextRequest) {
     const jobs = await Job.find({ userId }).sort({ createdAt: -1 }).lean();
     
     return NextResponse.json({ jobs });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching jobs:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch jobs";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch jobs" },
+      { error: message },
       { status: 500 }
     );
   }

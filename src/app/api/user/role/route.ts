@@ -13,10 +13,11 @@ export async function GET(req: NextRequest) {
     if (user instanceof NextResponse) return user;
 
     return NextResponse.json({ role: user.role, userId: user.userId });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error getting user role:", error);
+    const message = error instanceof Error ? error.message : "Failed to get user role";
     return NextResponse.json(
-      { error: error.message || "Failed to get user role" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -45,10 +46,11 @@ export async function PUT(req: NextRequest) {
     ).lean();
 
     return NextResponse.json({ success: true, profile: updated });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating user role:", error);
+    const message = error instanceof Error ? error.message : "Failed to update role";
     return NextResponse.json(
-      { error: error.message || "Failed to update role" },
+      { error: message },
       { status: 500 }
     );
   }

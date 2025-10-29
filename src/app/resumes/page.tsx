@@ -34,8 +34,8 @@ export default function ResumesPage() {
         throw new Error(payload.error || 'Failed to delete resume');
       }
       setResumes(prev => prev.filter(r => r._id !== id));
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete resume');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete resume');
     }
   }
 
@@ -58,9 +58,9 @@ export default function ResumesPage() {
         
         const data = await response.json();
         setResumes(data.resumes || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching resumes:', err);
-        setError(err.message || 'Failed to load resumes');
+        setError(err instanceof Error ? err.message : 'Failed to load resumes');
       } finally {
         setLoading(false);
       }

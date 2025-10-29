@@ -13,8 +13,23 @@ export default function ResumeMatchesPage() {
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [resume, setResume] = useState<any>(null);
-  const [jobMatches, setJobMatches] = useState<any[]>([]);
+  const [resume, setResume] = useState<{
+    _id: string;
+    fileName: string;
+    parsed: {
+      name?: string;
+      emails: string[];
+      skills: string[];
+    };
+    skills: string[];
+    atsScore: number;
+  } | null>(null);
+  const [jobMatches, setJobMatches] = useState<Array<{
+    title: string;
+    company: string;
+    score: number;
+    missingSkills: string[];
+  }>>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -42,9 +57,9 @@ export default function ResumeMatchesPage() {
         
         setResume(resumeData.resume);
         setJobMatches(matchesData.jobMatches || []);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Job matches fetch error:', err);
-        setError(err.message || 'Failed to load job matches');
+        setError(err instanceof Error ? err.message : 'Failed to load job matches');
       } finally {
         setLoading(false);
       }
@@ -81,7 +96,7 @@ export default function ResumeMatchesPage() {
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches</h2>
         {jobMatches.length > 0 ? (
           <div className="grid md:grid-cols-2 gap-6">
-            {jobMatches.map((job: any, idx: number) => (
+            {jobMatches.map((job, idx: number) => (
               <JobMatchCard 
                 key={idx} 
                 title={job.title} 

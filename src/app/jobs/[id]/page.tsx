@@ -43,9 +43,9 @@ export default function JobDetailsPage() {
         if (!response.ok) throw new Error('Failed to fetch job details');
         const data = await response.json();
         setJob(data.job);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching job details:', err);
-        setError(err.message || 'Failed to load job details');
+        setError(err instanceof Error ? err.message : 'Failed to load job details');
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ export default function JobDetailsPage() {
     if (jobId) {
       fetchJob();
     }
-  }, [jobId]);
+  }, [jobId, router]);
 
   const handleFindCandidates = () => {
     router.push(`/jobs/${jobId}/candidates`);

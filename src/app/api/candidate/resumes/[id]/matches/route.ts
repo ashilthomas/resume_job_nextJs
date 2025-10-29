@@ -6,14 +6,17 @@ import { findTopJobMatches } from "@/lib/utils";
 import { requireCandidateUser } from "@/lib/auth";
 // GET /api/candidate/resumes/:id/matches
 // Returns job matches for a specific resume by ID for candidates
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   try {
     const user = await requireCandidateUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const resumeId = params.id;
+    const { id: resumeId } = await context.params;
     
     const resume = await Resume.findOne({ _id: resumeId, userId }).lean();
     if (!resume) {
@@ -23,10 +26,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const jobs = await Job.find({}).lean();
     const jobMatches = findTopJobMatches(resume.skills, jobs);
     return NextResponse.json({ jobMatches });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error finding job matches:", error);
+    const message = error instanceof Error ? error.message : "Failed to find job matches";
     return NextResponse.json(
-      { error: error.message || "Failed to find job matches" },
+      { error: message },
       { status: 500 }
     );
   }

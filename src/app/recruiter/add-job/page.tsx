@@ -98,8 +98,8 @@ export default function AddJobPage() {
         router.push("/recruiter");
       }, 2000);
       
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setLoading(false);
     }
@@ -115,13 +115,13 @@ export default function AddJobPage() {
         if (!cancelled && data.role !== 'recruiter') {
           router.replace('/');
         }
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
     checkRole();
     return () => { cancelled = true; };
-  }, []);
+  }, [router]);
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <SectionHeader

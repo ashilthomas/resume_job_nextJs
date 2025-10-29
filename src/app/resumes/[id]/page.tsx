@@ -14,8 +14,18 @@ type Resume = {
     name: string;
     emails: string[];
     phones: string[];
-    education: any[];
-    workExperience: any[];
+    education: Array<{
+      institution?: string;
+      degree?: string;
+      field?: string;
+      year?: string;
+    }>;
+    workExperience: Array<{
+      company?: string;
+      position?: string;
+      duration?: string;
+      description?: string;
+    }>;
     skills: string[];
     summary: string;
   };
@@ -53,9 +63,9 @@ export default function ResumeDetailsPage() {
         
         const data = await response.json();
         setResume(data.resume);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Error fetching resume details:', err);
-        setError(err.message || 'Failed to load resume details');
+        setError(err instanceof Error ? err.message : 'Failed to load resume details');
       } finally {
         setLoading(false);
       }
@@ -96,8 +106,8 @@ export default function ResumeDetailsPage() {
         throw new Error(payload.error || 'Failed to delete resume');
       }
       router.push('/resumes');
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete resume');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete resume');
     } finally {
       setDeleting(false);
     }
@@ -132,7 +142,7 @@ export default function ResumeDetailsPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4">Work Experience</h2>
               <div className="space-y-6">
-                {resume.parsed.workExperience.map((exp: any, index: number) => (
+                {resume.parsed.workExperience.map((exp, index: number) => (
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
                     <h3 className="font-semibold text-lg">{exp.title || 'Position'}</h3>
                     <p className="text-gray-700">{exp.company || 'Company'}</p>
@@ -148,7 +158,7 @@ export default function ResumeDetailsPage() {
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4">Education</h2>
               <div className="space-y-4">
-                {resume.parsed.education.map((edu: any, index: number) => (
+                {resume.parsed.education.map((edu, index: number) => (
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
                     <h3 className="font-semibold">{edu.degree || 'Degree'}</h3>
                     <p className="text-gray-700">{edu.institution || 'Institution'}</p>

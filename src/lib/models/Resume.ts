@@ -3,7 +3,14 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IResume extends Document {
   fileName: string;
   filePath: string | null;
-  parsed: any;
+  parsed: {
+    rawText: string;
+    name?: string;
+    emails: string[];
+    phones: string[];
+    skills: string[];
+    summary: string;
+  };
   skills: string[];
   userId: string;
   atsScore: number;

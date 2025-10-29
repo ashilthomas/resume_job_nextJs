@@ -21,10 +21,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     }
     
     return NextResponse.json({ job });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching job:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch job";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch job" },
+      { error: message },
       { status: 500 }
     );
   }
@@ -46,10 +47,11 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting job:", error);
+    const message = error instanceof Error ? error.message : "Failed to delete job";
     return NextResponse.json(
-      { error: error.message || "Failed to delete job" },
+      { error: message },
       { status: 500 }
     );
   }

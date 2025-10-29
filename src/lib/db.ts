@@ -5,7 +5,7 @@ const MONGO_URI = process.env.MONGO_URI ||  "mongodb+srv://ashilthomas31_db_user
 if (!MONGO_URI) {
   throw new Error("Please define the MONGO_URI in .env.local");
 }
-let cached = (global as any).mongoose || { conn: null, promise: null };
+const cached = (global as typeof globalThis & { mongoose?: { conn: null | typeof mongoose; promise: null | Promise<typeof mongoose> } }).mongoose || { conn: null, promise: null };
 
 export async function connectDB() {
   if (cached.conn) return cached.conn;

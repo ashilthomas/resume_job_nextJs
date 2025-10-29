@@ -13,10 +13,11 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const resumes = await Resume.find({ userId }).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ resumes });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching resumes:", error);
+    const message = error instanceof Error ? error.message : "Failed to fetch resumes";
     return NextResponse.json(
-      { error: error.message || "Failed to fetch resumes" },
+      { error: message },
       { status: 500 }
     );
   }

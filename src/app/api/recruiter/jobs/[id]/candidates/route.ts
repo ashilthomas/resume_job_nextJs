@@ -38,10 +38,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     
     const sortedCandidates = candidates.sort((a, b) => b.matchScore - a.matchScore);
     return NextResponse.json({ job, candidates: sortedCandidates });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error finding candidates:", error);
+    const message = error instanceof Error ? error.message : "Failed to find candidates";
     return NextResponse.json(
-      { error: error.message || "Failed to find candidates" },
+      { error: message },
       { status: 500 }
     );
   }
