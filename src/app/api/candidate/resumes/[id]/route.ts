@@ -4,14 +4,18 @@ import Resume from "@/lib/models/Resume";
 import { requireCandidateUser } from "@/lib/auth";
 // GET /api/candidate/resumes/:id
 // Returns a specific resume by ID for candidates
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireCandidateUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const resumeId = params.id;
+    const resumeId = id;
     const resume = await Resume.findOne({ _id: resumeId, userId }).lean();
     if (!resume) {
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
@@ -28,14 +32,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 // DELETE /api/candidate/resumes/:id
 // Deletes a specific resume by ID for candidates
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
   try {
     const user = await requireCandidateUser(req);
     if (user instanceof NextResponse) return user;
     const { userId } = user;
     
     await connectDB();
-    const resumeId = params.id;
+    const resumeId = id;
     const deleted = await Resume.findOneAndDelete({ _id: resumeId, userId });
     if (!deleted) {
       return NextResponse.json({ error: "Resume not found" }, { status: 404 });
