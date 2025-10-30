@@ -29,16 +29,17 @@ export interface JobLike {
 
 export function findTopJobMatches(candidateSkills: string[], jobs: JobLike[], limit = 5) {
   if (!jobs.length) return [];
-  
+
   const jobsWithScores = jobs.map(job => {
     const { score, missingSkills } = calculateJobMatch(candidateSkills, job.requiredSkills);
     return {
-      ...job,
+      title: (job as { title?: string }).title || 'Unknown Title',
+      company: (job as { company?: string }).company || 'Unknown Company',
       score,
       missingSkills
-    } as JobLike & { score: number; missingSkills: string[] };
+    };
   });
-  
+
   // Sort by score (highest first) and take the top matches
   return jobsWithScores
     .sort((a, b) => b.score - a.score)

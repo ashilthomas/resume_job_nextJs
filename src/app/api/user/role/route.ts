@@ -10,7 +10,7 @@ type AllowedRole = typeof allowedRoles[number];
 export async function GET(req: NextRequest) {
   try {
     const user = await getUserWithRole(req);
-    if (user instanceof NextResponse) return user;
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     return NextResponse.json({ role: user.role, userId: user.userId });
   } catch (error: unknown) {
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const user = await getUserWithRole(req);
-    if (user instanceof NextResponse) return user;
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json();
     const role: string | undefined = body?.role;

@@ -62,7 +62,7 @@ export default function DashboardPage() {
         const email = latestResume.parsed?.emails?.[0] || '';
         
         setResume({
-          name,
+          name: name || 'Candidate',
           email,
           skills: latestResume.skills || [],
           atsScore: latestResume.atsScore || 0,
@@ -107,7 +107,7 @@ export default function DashboardPage() {
         subtitle={resume?.email ? `${resume.email} • Here's your current resume insights, ATS performance, and top job matches.` : `Here's your current resume insights, ATS performance, and top job matches.`}
       />
 
-      <ResumeCard {...resume} />
+      {resume && <ResumeCard {...resume} />}
 
       <section>
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">🎯 Top Job Matches for {firstName}</h2>

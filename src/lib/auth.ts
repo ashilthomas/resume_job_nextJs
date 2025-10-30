@@ -4,18 +4,18 @@ import { connectDB } from "./db";
 import UserProfile from "./models/UserProfile";
 
 // Get user with role information
-export async function getUserWithRole(req: NextRequest) {
+export async function getUserWithRole(req: NextRequest): Promise<{ userId: string; role: string } | null> {
   const { userId } = getAuth(req);
-  
+
   if (!userId) {
     return null;
   }
-  
+
   await connectDB();
-  
+
   // Find or create user profile
-  let userProfile = await UserProfile.findOne({ userId }).lean();
-  
+  let userProfile = await UserProfile.findOne({ userId });
+
   // If no profile exists yet, create a default one as candidate
   if (!userProfile) {
     userProfile = await UserProfile.create({
@@ -23,7 +23,7 @@ export async function getUserWithRole(req: NextRequest) {
       role: "candidate"
     });
   }
-  
+
   return {
     userId,
     role: userProfile.role

@@ -144,9 +144,9 @@ export default function ResumeDetailsPage() {
               <div className="space-y-6">
                 {resume.parsed.workExperience.map((exp, index: number) => (
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
-                    <h3 className="font-semibold text-lg">{exp.title || 'Position'}</h3>
+                    <h3 className="font-semibold text-lg">{exp.position || 'Position'}</h3>
                     <p className="text-gray-700">{exp.company || 'Company'}</p>
-                    {exp.dates && <p className="text-gray-500 text-sm">{exp.dates}</p>}
+                    {exp.duration && <p className="text-gray-500 text-sm">{exp.duration}</p>}
                     {exp.description && <p className="mt-2 text-gray-600">{exp.description}</p>}
                   </div>
                 ))}
@@ -162,7 +162,7 @@ export default function ResumeDetailsPage() {
                   <div key={index} className="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
                     <h3 className="font-semibold">{edu.degree || 'Degree'}</h3>
                     <p className="text-gray-700">{edu.institution || 'Institution'}</p>
-                    {edu.dates && <p className="text-gray-500 text-sm">{edu.dates}</p>}
+                    {edu.year && <p className="text-gray-500 text-sm">{edu.year}</p>}
                   </div>
                 ))}
               </div>

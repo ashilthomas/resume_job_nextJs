@@ -8,11 +8,7 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 export default function UploadPage() {
   const [result, setResult] = useState<{
     success: boolean;
-    data?: {
-      resumeId: string;
-      fileName: string;
-      atsScore: number;
-    };
+    data?: unknown;
     error?: string;
   } | null>(null);
 
@@ -50,14 +46,14 @@ export default function UploadPage() {
             <div>
               <p className="font-medium">Top Skills Detected</p>
               <ul className="list-disc pl-5 mt-2">
-                {(result?.skills || []).slice(0, 6).map((skill: string, idx: number) => (
+                {((result?.data as { skills?: string[] })?.skills || []).slice(0, 6).map((skill: string, idx: number) => (
                   <li key={idx}>{skill}</li>
                 ))}
               </ul>
             </div>
             <div>
               <p className="font-medium">ATS Score</p>
-              <p className="text-2xl font-bold text-green-600">{result?.atsScore ?? 0}</p>
+              <p className="text-2xl font-bold text-green-600">{(result?.data as { atsScore?: number })?.atsScore ?? 0}</p>
             </div>
           </div>
         </div>

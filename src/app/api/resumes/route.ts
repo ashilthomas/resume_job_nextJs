@@ -8,7 +8,7 @@ export async function GET() {
     await connectDB();
     
     // Get the authenticated user ID from Clerk
-    const { userId } = auth();
+    const { userId } = await auth();
    
     
     
